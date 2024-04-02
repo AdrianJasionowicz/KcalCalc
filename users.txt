@@ -1,0 +1,3 @@
+Adrian,123,Adrian,Jasionowicz,0.0,0.0,0
+Jan,123,null,null,0.0,0.0,0
+maja,maj,null,null,0.0,0.0,0
