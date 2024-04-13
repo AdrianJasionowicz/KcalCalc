@@ -1,6 +1,6 @@
 package controller.weight;
 
-import entity.weight.WeightMeasure;
+import entity.weight.WeightHistory;
 import service.weight.WeightService;
 
 import java.time.LocalDate;
@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class WeightController {
-    private WeightService weightService;
+    private final WeightService weightService;
 
     public WeightController(WeightService weightService) {
         this.weightService = weightService;
@@ -17,8 +17,7 @@ public class WeightController {
     Scanner scanner = new Scanner(System.in);
 
     public void WeightMenu() {
-
-        weightService.loadMeasuresFromFile();
+        weightService.loadMeasurementsFromFile();
         weightService.loadWeightFromFile();
         boolean shouldEnd = true;
         do {
@@ -55,6 +54,7 @@ public class WeightController {
                     System.out.println("Podaj nową wagę:");
                     double newWeight = scanner.nextDouble();
                     weightService.editWeight(date, newWeight);
+                    break;
                 case 5:
                     scanner.nextLine();
                     System.out.println("Podaj datę pomiaru ciała (RRRR-MM-DD):");
@@ -80,32 +80,21 @@ public class WeightController {
                     System.out.print("Łydka (cm): ");
                     double calf = scanner.nextDouble();
                     System.out.print("Waga (kg): ");
-                    double weight = scanner.nextDouble();
-                    WeightMeasure newMeasure = new WeightMeasure(measureDate, weight, neck, chest, armBiceps, aboveNavel, navel, belowNavel, hips, thig, calf);
+                    WeightHistory newMeasure = new WeightHistory(measureDate, neck, chest, armBiceps, aboveNavel, navel, belowNavel, hips, thig, calf);
                     weightService.addMeasure(newMeasure);
                     break;
                 case 6:
-                    weightService.getBodyMeasurements();
+                    scanner.nextLine();
+                    System.out.println("Podaj datę:");
+                    weightService.printMeasuresHistory();
                     break;
                 case 7:
-                    weightService.loadMeasuresFromFile();
                     weightService.printMeasuresHistory();
                     scanner.nextLine();
                     System.out.println("Podaj datę pomiaru do edycji (RRRR-MM-DD):");
                     String measuresDateString = scanner.nextLine();
                     LocalDate measuresDate = LocalDate.parse(measuresDateString);
-                    boolean foundMeasure = false;
-                    List<WeightMeasure> bodyMeasurements = weightService.getBodyMeasurements();
-                    for (WeightMeasure measure : bodyMeasurements) {
-                        if (measure.getDate().equals(measuresDate)) {
-                            foundMeasure = true;
-                            break;
-                        }
-                    }
-                    if (!foundMeasure) {
-                        System.out.println("Nie znaleziono pomiaru sylwetki dla podanej daty.");
-                        break;
-                    }
+
                     System.out.print("Nowa wartość szyi (cm): ");
                     double newNeck = scanner.nextDouble();
                     System.out.print("Nowa wartość klatki piersiowej (cm): ");
@@ -124,11 +113,12 @@ public class WeightController {
                     double newThig = scanner.nextDouble();
                     System.out.print("Nowa wartość łydki (cm): ");
                     double newCalf = scanner.nextDouble();
-                    weightService.editMeasure(measuresDate, newNeck, newChest, newArmBiceps, newAboveNavel, newNavel, newBelowNavel, newHips, newThig, newCalf);
-
+                    WeightHistory newMeasures = new WeightHistory(newNeck,newChest,newArmBiceps, newAboveNavel, newNavel, newBelowNavel, newHips, newThig, newCalf)
+                    weightService.editMeasure(measuresDate,newMeasures);
                     break;
                 case 9:
                     shouldEnd = false;
+                    weightService.saveMeasurementsToFile();
                     weightService.saveWeightToFile();
                     break;
             }

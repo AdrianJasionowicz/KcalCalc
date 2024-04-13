@@ -1,7 +1,6 @@
 package service.activity;
 
 import entity.activity.Activity;
-import entity.user.User;
 import repository.ActivityRepository;
 import service.user.UserService;
 
@@ -11,57 +10,24 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Scanner;
 
 public class ActivityService {
-    private ActivityRepository activityRepository;
+    private final ActivityRepository activityRepository;
     private Activity activity;
-    private User loggedUser;
     private UserService userService;
     private List<Activity> activityList;
-    private Map<Integer, Activity> activityMap;
-    Scanner scanner = new Scanner(System.in);
 
-    public ActivityService(ActivityRepository activityRepository, Activity activity, UserService userService, List<Activity> activityList, Map<Integer, Activity> activityMap) {
+    public ActivityService(ActivityRepository activityRepository, Activity activity, UserService userService, List<Activity> activityList) {
         this.activityRepository = activityRepository;
         this.activity = activity;
         this.activityList = activityList;
-        this.activityMap = activityMap;
         this.userService = userService;
-        loggedUser = userService.getLoggedUserOrThrow();
     }
 
     public void addActivity(Activity activity) {
         activityRepository.addActivity(activity);
-    }
-
-    public Activity createActivity() {
-        System.out.println("Podaj nazwę aktywności:");
-        String activityName = scanner.nextLine();
-
-        System.out.println("Podaj czas trwania aktywności (w godzinach):");
-        double timeInHours = scanner.nextDouble();
-
-        System.out.println("Podaj skalę wyczerpania (od 1 do 10):");
-        int exhaustedScale = scanner.nextInt();
-        if (exhaustedScale > 10 || exhaustedScale < 1) {
-            System.out.println("Blad skala dziala od 1 do 10 podaj jeszcze raz");
-            exhaustedScale = scanner.nextInt();
-        }
-        System.out.println("Podaj opis aktywności:");
-        scanner.nextLine();
-        String description = scanner.nextLine();
-
-
-        Activity activity = new Activity(LocalDate.now(), activityName, timeInHours, exhaustedScale, description);
-
-
-
-
-        System.out.println("Dodano nową aktywność.");
-        return activity;
     }
 
 
@@ -83,7 +49,7 @@ public class ActivityService {
         }
     }
 
-    public void editActivity(int activityId) throws IOException {
+    public void editActivity(int activityId) {
         Optional<Activity> optionalActivity = activityRepository.getActivityById(activityId);
         if (optionalActivity.isPresent()) {
             Activity activity = optionalActivity.get();
@@ -102,7 +68,7 @@ public class ActivityService {
 
     public void saveActivities() {
         try {
-            String fileName = "activity_" + loggedUser.getUsername() + ".txt";
+            String fileName = "activity_" + userService.getLoggedUserOrThrow().getUsername() + ".txt";
             File file = new File(fileName);
             if (!file.exists()) {
                 file.createNewFile();
@@ -124,7 +90,7 @@ public class ActivityService {
 
     public void loadActivities() {
         try {
-            String fileName = "activity_" + loggedUser.getUsername() + ".txt";
+            String fileName = "activity_" + userService.getLoggedUserOrThrow().getUsername() + ".txt";
             File file = new File(fileName);
             if (!file.exists()) {
                 file.createNewFile();
@@ -145,7 +111,6 @@ public class ActivityService {
                     Activity activity = new Activity(date, activityName, timeInHours, exhaustedScale, description);
                     activity.setId(id);
                     activityRepository.addActivity(activity);
-                    activityMap.put(id, activity);
                 }
                 scanner.close();
             } else {
@@ -156,16 +121,4 @@ public class ActivityService {
         }
     }
 
-    public ActivityService(ActivityRepository activityRepository) {
-        this.activityRepository = activityRepository;
-    }
-
-
-    public void updateActivity(Activity activity) throws IOException {
-        activityRepository.updateActivity(activity);
-    }
-
-    public void deleteActivityById(int activityId) {
-        activityRepository.deleteActivityById(activityId);
-    }
 }

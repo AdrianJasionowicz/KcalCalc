@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class WaterConsumptionRepository {
-    private Map<LocalDate, WaterConsumptionToday> historyMap;
+    private final Map<LocalDate, WaterConsumptionToday> historyMap;
 
     public WaterConsumptionRepository() {
         historyMap = new HashMap<>();

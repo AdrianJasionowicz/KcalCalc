@@ -15,17 +15,15 @@ import service.user.UserService;
 import service.water.WaterService;
 import service.weight.WeightService;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Scanner;
 
 public class MainController {
     Scanner scanner = new Scanner(System.in);
-    private UserController userController;
-    private UserRepository userRepository;
-    private UserService userService;
+    private final UserController userController;
+    private final UserRepository userRepository;
+    private final UserService userService;
 
     public MainController() {
         this.userRepository = new UserRepository();
@@ -38,7 +36,7 @@ public class MainController {
         userController.authorization();
     }
 
-    public void run() throws IOException {
+    public void run() {
         WeightHistoryRepository weightHistoryRepository = new WeightHistoryRepository(LocalDate.now());
 
         boolean shouldEnd = true;
@@ -56,8 +54,8 @@ public class MainController {
             switch (userChoice) {
                 case 5:
                     Activity activity = new Activity(LocalDate.now(), "Test", 1.5, 5, "opis aktywności");
-                    ActivityRepository activityRepository = new ActivityRepository(new ArrayList<>(), new HashMap<>());
-                    ActivityService activityService = new ActivityService(activityRepository, activity, userService, new ArrayList<>(), new HashMap<>());
+                    ActivityRepository activityRepository = new ActivityRepository();
+                    ActivityService activityService = new ActivityService(activityRepository, activity, userService,new ArrayList<>());
                     activityService.loadActivities();
                     ActivityController activityController = new ActivityController(activityService);
                     activityController.activityAssistant();
@@ -71,7 +69,7 @@ public class MainController {
                     waterController.waterSupplyMenu();
                     break;
                 case 7:
-                    WeightService weightService = new WeightService(weightHistoryRepository, null, null, userService);
+                    WeightService weightService = new WeightService(weightHistoryRepository, null, userService);
                     WeightController weightController = new WeightController(weightService);
                     weightController.WeightMenu();
                     break;

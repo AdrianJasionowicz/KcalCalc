@@ -2,57 +2,72 @@ package repository;
 
 import entity.activity.Activity;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public class ActivityRepository {
     private LocalDate date;
-    private List<Activity> activityList;
-    private Map<Integer, Activity> activityMap;
-
-    public ActivityRepository(List<Activity> activityList, Map<Integer, Activity> activityMap) {
-        this.activityList = activityList;
-        this.activityMap = activityMap;
-    }
+    private final List<Activity> activityList = new ArrayList<>();
 
 
-    public Optional<Activity> getActivityById(Integer id) throws IOException {
-        Optional<Activity> optionalActivity = Optional.ofNullable(activityMap.get(id));
-
-        if (optionalActivity.isEmpty()) {
-            throw new IOException("No Activity found with this id");
-
+    public Optional<Activity> getActivityById(Integer id) {
+        for (Activity activity : activityList) {
+           if ( activity.getId().equals(id) ) {
+               return Optional.of(activity);
+           }
         }
-        return optionalActivity;
+        return Optional.empty();
+
     }
 
-    public void deleteActivityById(Integer Id) {
-        activityMap.remove(Id);
+    public void deleteActivityById(Integer id) {
+      /*  for (int i = 0; i < activityList.size(); i++) {
+            if (activityList.get(i).getId().equals(id)) {
+                activityList.remove(i);
+                break;
+            }
+        }*/
+      /*  for (int i = 0; i < activityList.size(); i++) {
+            Activity activity = activityList.get(i);
+            if (activity.getId().equals(id)) {
+                activityList.remove(activity);
+                break;
+            }
+        }*/
+
+        for ( Activity activity : new ArrayList<>( activityList)) {
+            if (activity.getId().equals(id)) {
+                activityList.remove(activity);
+                break;
+            }
+        }
     }
     public void addActivity(Activity activity) {
         int newId = generateNewId();
 
         activity.setId(newId);
 
-        activityMap.put(newId, activity);
 
         activityList.add(activity);
     }
 
     private int generateNewId() {
-        int maxId = activityMap.keySet().stream().mapToInt(Integer::intValue).max().orElse(0);
+        int maxId =0;
+        for (Activity activity : activityList) {
+            if (activity.getId() > maxId) {
+                maxId = activity.getId();
+            }
+        }
         return maxId + 1;
     }
 
     public List<Activity> getAllActivities() {
-        return new ArrayList<>(activityMap.values());
+        return activityList;
     }
 
-    public void updateActivity(Activity activity) throws IOException {
+    public void updateActivity(Activity activity) {
         Integer activityId = activity.getId();
         Optional<Activity> optionalActivity = getActivityById(activityId);
 

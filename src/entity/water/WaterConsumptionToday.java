@@ -3,7 +3,7 @@ package entity.water;
 import java.time.LocalDate;
 
 public class WaterConsumptionToday {
-    private LocalDate date;
+    private final LocalDate date;
     private int waterConsumption = 0;
     private int dailyTarget;
 

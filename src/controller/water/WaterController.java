@@ -8,8 +8,8 @@ import java.util.Scanner;
 public class WaterController {
     Scanner scanner = new Scanner(System.in);
 
-    private WaterService waterService;
-    private MainController mainController = new MainController();
+    private final WaterService waterService;
+    private final MainController mainController = new MainController();
 
 
     public WaterController(WaterService waterService) {
@@ -17,7 +17,6 @@ public class WaterController {
         waterService.loadHistoryData();
         waterService.loadHistoryListData();
     }
-
 
     public void waterSupplyMenu() {
         waterService.loadTodayData();

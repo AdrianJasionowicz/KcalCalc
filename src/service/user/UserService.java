@@ -12,31 +12,33 @@ import java.util.Optional;
 import java.util.Scanner;
 
 public class UserService {
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
     private User loggedUser = null;
 
     public void loadUsersFromFile() {
         try {
             File file = new File("users.txt");
-            if (file.exists()) {
-                Scanner scanner = new Scanner(file);
-                while (scanner.hasNextLine()) {
-                    String line = scanner.nextLine();
-                    String[] parts = line.split(",");
-                    if (parts.length == 7) {
-                        String username = parts[0];
-                        String password = parts[1];
-                        String name = parts[2];
-                        String surname = parts[3];
-                        double weight = Double.parseDouble(parts[4]);
-                        double height = Double.parseDouble(parts[5]);
-                        int age = Integer.parseInt(parts[6]);
-                        User user = new User(username, password, name, surname, weight, height, age);
-                        userRepository.addData(user);
-                    }
-                }
-                scanner.close();
+            if (!file.exists()) {
+              return;
             }
+            Scanner scanner = new Scanner(file);
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] parts = line.split(",");
+                if (parts.length != 7) {
+                  continue;
+                }
+                String username = parts[0];
+                String password = parts[1];
+                String name = parts[2];
+                String surname = parts[3];
+                double weight = Double.parseDouble(parts[4]);
+                double height = Double.parseDouble(parts[5]);
+                int age = Integer.parseInt(parts[6]);
+                User user = new User(username, password, name, surname, weight, height, age);
+                userRepository.addData(user);
+            }
+            scanner.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -91,11 +93,7 @@ public class UserService {
             }
             writer.close();
             fileWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            saveAllToFile();
-        } catch (IllegalStateException e) {
-            saveAllToFile();
+        } catch (IOException | IllegalStateException e) {
             e.printStackTrace();
         }
 
@@ -110,8 +108,7 @@ public class UserService {
         logged.setAge(updateData.getAge());
         userRepository.deleteByUsername(logged.getUsername());
         userRepository.addData(loggedUser);
-        // saveAllToFile();
-        //todo pozostałe parametry
+
     }
 
     public void setUsername(String username) {
