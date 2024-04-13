@@ -1,7 +1,6 @@
 package controller.water;
 
 import controller.MainController;
-import repository.UserRepository;
 import service.water.WaterService;
 
 import java.util.Scanner;
@@ -11,11 +10,10 @@ public class WaterController {
 
     private WaterService waterService;
     private MainController mainController = new MainController();
-    private UserRepository userRepository;
 
-    public WaterController(WaterService waterService, UserRepository userRepository) {
+
+    public WaterController(WaterService waterService) {
         this.waterService = waterService;
-        this.userRepository = userRepository;
         waterService.loadHistoryData();
         waterService.loadHistoryListData();
     }

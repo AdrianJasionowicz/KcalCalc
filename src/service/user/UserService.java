@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -40,6 +41,7 @@ public class UserService {
             e.printStackTrace();
         }
     }
+
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
@@ -62,10 +64,9 @@ public class UserService {
             return false;
         }
         User user = optionalUser.get();
-        if (!loggedUser.getPassword().equals(password)) {
+        if (!user.getPassword().equals(password)) {
             return false;
         }
-
         loggedUser = user;
         return true;
     }
@@ -79,43 +80,25 @@ public class UserService {
     public void saveAllToFile() {
         try {
             File file = new File("users.txt");
-            if (!file.exists()) {
-                file.createNewFile();
+            if (file.exists()) {
+                Files.deleteIfExists(file.toPath());
             }
-            FileWriter fileWriter = new FileWriter(file, true);
+
+            FileWriter fileWriter = new FileWriter(file);
             PrintWriter writer = new PrintWriter(fileWriter);
             for (User user : userRepository.getAllUsers()) {
-                if (!userExistsInFile(user)) {
-                    String tekst = user.getLogin() + "," + user.getPassword() + "," + user.getName() + "," + user.getSurname() + "," + user.getWeight() + "," + user.getHeight() + "," + user.getAge();
-                    writer.println(tekst);
-                }
+                writer.println(user.getLogin() + "," + user.getPassword() + "," + user.getName() + "," + user.getSurname() + "," + user.getWeight() + "," + user.getHeight() + "," + user.getAge());
             }
             writer.close();
             fileWriter.close();
-            System.out.println("Zapisano dane do pliku.");
         } catch (IOException e) {
             e.printStackTrace();
+            saveAllToFile();
+        } catch (IllegalStateException e) {
+            saveAllToFile();
+            e.printStackTrace();
         }
-    }
 
-    private boolean userExistsInFile(User user) throws IOException {
-        File file = new File("users.txt");
-        Scanner scanner = new Scanner(file);
-        while (scanner.hasNextLine()) {
-            String line = scanner.nextLine();
-            String[] parts = line.split(",");
-            if (parts.length >= 2 && parts[0].equals(user.getLogin())) {
-                scanner.close();
-                return true;
-            }
-        }
-        scanner.close();
-        return false;
-    }
-
-    public User fastUser(String usename, String password) {
-        User user = new User(usename, password);
-        return user;
     }
 
     public void updateLoggedUser(User updateData) {
@@ -125,12 +108,15 @@ public class UserService {
         logged.setWeight(updateData.getWeight());
         logged.setHeight(updateData.getHeight());
         logged.setAge(updateData.getAge());
+        userRepository.deleteByUsername(logged.getUsername());
+        userRepository.addData(loggedUser);
+        // saveAllToFile();
         //todo pozostałe parametry
     }
 
     public void setUsername(String username) {
-    userRepository.getUserByUsername(loggedUser.getUsername());
-
+        userRepository.getUserByUsername(loggedUser.getUsername());
+        loggedUser.setUsername(username);
     }
 }
 /*

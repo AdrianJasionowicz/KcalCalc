@@ -14,14 +14,6 @@ public class WeightMeasureRepository {
         this.weightMeasures = new ArrayList<>();
     }
 
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
     public List<WeightMeasure> getMeasures() {
         return weightMeasures;
     }

@@ -2,7 +2,6 @@ package service.water;
 
 import entity.user.User;
 import entity.water.WaterConsumptionToday;
-import repository.UserRepository;
 import repository.WaterConsumptionRepository;
 import service.user.UserService;
 
@@ -16,21 +15,21 @@ import java.util.Map;
 public class WaterService {
     private WaterConsumptionToday waterConsumptionToday;
     private WaterConsumptionRepository waterConsumptionRepository;
-    private final UserRepository userRepository;
     private UserService userService;
+    private User loggedUser;
 
-    public WaterService(WaterConsumptionToday waterConsumptionToday, WaterConsumptionRepository waterConsumptionRepository, UserRepository userRepository, UserService userService) {
+    public WaterService(WaterConsumptionToday waterConsumptionToday, WaterConsumptionRepository waterConsumptionRepository, UserService userService) {
         this.waterConsumptionToday = waterConsumptionToday;
         this.waterConsumptionRepository = waterConsumptionRepository;
-        this.userRepository = userRepository;
-        //      this.userService = userService;
+        this.userService = userService;
+        this.loggedUser = userService.getLoggedUserOrThrow();
     }
 
     public void loadHistoryData() {
-        User user = userService.getLoggedUserOrThrow();
+
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        String fileName = "water_history_" + userRepository.getUsername(user.getUsername()) + ".txt";
+        String fileName = "water_history_" + loggedUser.getUsername() + ".txt";
         File file = new File(fileName);
         if (!file.exists()) {
             System.out.println("Plik historii wody nie istnieje.");
@@ -58,8 +57,8 @@ public class WaterService {
 
     public void saveData() {
         try {
-            User user = userService.getLoggedUserOrThrow();
-            String fileName = "water_history_" + userRepository.getUsername(user.getUsername()) + ".txt";
+
+            String fileName = "water_history_" + loggedUser.getUsername() + ".txt";
             String dateString = waterConsumptionToday.getDate().toString();
             String newData = dateString + "," + waterConsumptionToday.getWaterConsumption() + "," + waterConsumptionToday.getDailyTarget();
 
@@ -103,9 +102,11 @@ public class WaterService {
         LocalDate today = LocalDate.now();
         WaterConsumptionToday todayData = null;
         WaterConsumptionToday previousDayData = null;
+
         boolean isTargetChanged = false;
         User user = userService.getLoggedUserOrThrow();
-        String fileName = "water_history_" + userRepository.getUsername(user.getUsername()) + ".txt";
+        String fileName = "water_history_" + userService.getLoggedUserOrThrow() + ".txt";
+
         try {
             File file = new File(fileName);
             if (file.exists()) {
@@ -142,11 +143,10 @@ public class WaterService {
     }
 
     public int getYesterdayDailyTarget() {
-        User user = userService.getLoggedUserOrThrow();
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate yesterday = LocalDate.now().minusDays(1);
         int target = -1;
-        String fileName = "water_history_" + userRepository.getUsername(user.getUsername()) + ".txt";
+        String fileName = "water_history_" + loggedUser.getUsername() + ".txt";
         try {
             File file = new File(fileName);
             if (file.exists()) {
@@ -197,9 +197,8 @@ public class WaterService {
     }
 
     public void loadHistoryListData() {
-        User user = userService.getLoggedUserOrThrow();
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String fileName = "water_history_ " + userRepository.getUsername(user.getUsername()) + ".txt";
+        String fileName = "water_history_ " + loggedUser.getUsername() + ".txt";
 
         try {
             File file = new File(fileName);
@@ -238,4 +237,3 @@ public class WaterService {
         }
     }
 }
-

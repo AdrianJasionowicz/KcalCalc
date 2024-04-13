@@ -18,22 +18,24 @@ public class WeightService {
     private List<WeightHistory> weightHistories;
     private WeightMeasureRepository weightMeasureRepository;
     private UserService userService;
+    private User loggedUser;
 
-    public WeightService(WeightHistoryRepository weightHistoryRepository, WeightHistory weightHistory, WeightMeasureRepository weightMeasureRepository) {
+    public WeightService(WeightHistoryRepository weightHistoryRepository, WeightHistory weightHistory, WeightMeasureRepository weightMeasureRepository, UserService userService) {
         this.weightHistoryRepository = weightHistoryRepository;
         this.weightHistory = weightHistory;
         this.weightHistories = weightHistoryRepository.getWeightHistories();
         this.weightMeasureRepository = weightMeasureRepository;
+        this.userService = userService;
+        this.loggedUser = userService.getLoggedUserOrThrow();
     }
 
     public void saveWeightToFile() {
-        User user = userService.getLoggedUserOrThrow();
-        String filename = "weightHistory_" + user.getUsername() + ".txt";
+        String filename = "weightHistory_" + loggedUser.getUsername() + ".txt";
         File file = new File(filename);
 
         try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
             for (WeightHistory history : weightHistoryRepository.getWeightHistories()) {
-                writer.println(history.getDate() + "," + history.getWeight());
+                writer.println(history.getDate() + "," + history.getWeight() +"," + history.getBmi());
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -41,9 +43,8 @@ public class WeightService {
     }
 
     public void loadWeightFromFile() {
-        User user = userService.getLoggedUserOrThrow();
         List<WeightHistory> weightHistories = new ArrayList<>();
-        String filename = "weightHistory_" + user.getUsername() + ".txt";
+        String filename = "weightHistory_" + loggedUser.getUsername() + ".txt";
         File file = new File(filename);
         if (!file.exists()) {
             System.out.println("Plik historii wagi nie istnieje.");
@@ -55,17 +56,14 @@ public class WeightService {
                     String[] parts = line.split(",");
                     LocalDate date = LocalDate.parse(parts[0]);
                     double weight = Double.parseDouble(parts[1]);
-                    weightHistories.add(new WeightHistory(date, weight));
+                    double bmi = Double.parseDouble(parts[2]);
+                    weightHistories.add(new WeightHistory(date, weight,bmi));
                 }
                 weightHistoryRepository.setWeightHistories(weightHistories);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-    }
-
-    public void addWeight(double weight) {
-        weightHistoryRepository.add(LocalDate.now(), weight);
     }
 
     public void setWeight(LocalDate date, double weight) {
@@ -92,8 +90,7 @@ public class WeightService {
     }
 
     public void saveMeasuresToFile() {
-        User user = userService.getLoggedUserOrThrow();
-        String fileName = "MeasuresHistory_" + user.getUsername() + ".txt";
+        String fileName = "MeasuresHistory_" + loggedUser.getUsername() + ".txt";
         File file = new File(fileName);
         try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
             for (WeightMeasure measure : weightMeasureRepository.getMeasures()) {
@@ -105,9 +102,8 @@ public class WeightService {
     }
 
     public void loadMeasuresFromFile() {
-        User user = userService.getLoggedUserOrThrow();
         List<WeightMeasure> weightMeasures = new ArrayList<>();
-        String filename = "MeasuresHistory_" + user.getUsername() + ".txt";
+        String filename = "MeasuresHistory_" + loggedUser.getUsername() + ".txt";
 
         File file = new File(filename);
         if (!file.exists()) {
@@ -210,4 +206,18 @@ public class WeightService {
         }
     }
 
+    public void addWeight(double weight) {
+        LocalDate date = LocalDate.now();
+        double height = userService.getLoggedUserOrThrow().getHeight();
+        double bmi = calculateBmi(weight,height);
+        System.out.println(bmi);
+
+        WeightHistory weightHistory = new WeightHistory(date, weight, bmi);
+        weightHistoryRepository.addWeightHistory(weightHistory);
+    }
+
+
+    private double calculateBmi(double weight, double height) {
+        return weight / (height * height);
+    }
 }

@@ -12,9 +12,6 @@ public class User {
     private double weight;
     private double height;
 
-    public User() {
-    }
-
     public User(String username, String password) {
         this.username = username;
         this.password = password;
@@ -104,6 +101,5 @@ public class User {
     public int hashCode() {
         return Objects.hash(username, password, name, surname, weight, height, age);
     }
-
 
 }

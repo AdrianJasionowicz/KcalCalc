@@ -15,15 +15,6 @@ public class WeightHistoryRepository {
         this.weightHistories = new ArrayList<>();
     }
 
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
     public List<WeightHistory> getWeightHistories() {
         return weightHistories;
     }
@@ -58,7 +49,7 @@ public class WeightHistoryRepository {
     public void showHistory() {
         System.out.println("Historia pomiarów:");
         for (WeightHistory history : weightHistories) {
-            System.out.println("Data: " + history.getDate() + ", Waga: " + history.getWeight() /* +  ", Bmi: " + history.getBmi() */ );
+            System.out.println("Data: " + history.getDate() + ", Waga: " + history.getWeight()  +  ", Bmi: " + history.getBmi() );
         }
     }
 }

@@ -1,9 +1,10 @@
 import controller.MainController;
 
+import java.io.IOException;
 import java.util.Optional;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         String content = "abc";
 //        Optional<String> box = Optional.of("sdf");
         Optional<String> box = Optional.ofNullable(content);

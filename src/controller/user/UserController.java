@@ -95,6 +95,7 @@ public class UserController {
                     int age = scanner.nextInt();
                     User updateData = new User(null, null, name, surname, weight, height, age);
                     userService.updateLoggedUser(updateData);
+                  //  userService.saveAllToFile();
                     System.out.println("Wszystie dane podano! :) ");
                     break;
                 case 2:

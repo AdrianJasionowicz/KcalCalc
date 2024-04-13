@@ -5,12 +5,17 @@ import java.time.LocalDate;
 public class WeightHistory {
     private LocalDate date;
     private double weight;
+    private double bmi;
 
-    //   private double bmi;
-    //   private User user;
     public WeightHistory(LocalDate date, double weight) {
         this.date = date;
         this.weight = weight;
+    }
+
+    public WeightHistory(LocalDate date, double weight, double bmi) {
+        this.date = date;
+        this.weight = weight;
+        this.bmi = bmi;
     }
 
     public LocalDate getDate() {
@@ -24,12 +29,7 @@ public class WeightHistory {
     public void setWeight(double weight) {
         this.weight = weight;
     }
-/*
-    private double calculateBMI() {
-        double height = user.getHeight();
-        bmi = weight / (height * height);
-        return bmi;
-    }
+
 
     public double getBmi() {
         return bmi;
@@ -39,7 +39,6 @@ public class WeightHistory {
         this.bmi = bmi;
     }
 
- */
 }
 
 
